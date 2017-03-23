@@ -3,8 +3,6 @@
 import ActivityService from './services/ActivityService'
 import BackgroundTaskService from './services/BackgroundTaskService'
 import ExtensionManager from './services/ExtensionManager'
-import LanguageService from './services/LanguageService'
-import RouteHandler from './services/RouteHandler'
 import SettingsManager from './services/SettingsManager'
 
 import DocumentDatabase from './storage/DocumentDatabase'
@@ -16,8 +14,6 @@ exports.Services = {
   ActivityService: ActivityService,
   BackgroundTaskService: BackgroundTaskService,
   ExtensionManager: ExtensionManager,
-  LanguageService: LanguageService,
-  RouteHandler: RouteHandler,
   SettingsManager: SettingsManager
 }
 
