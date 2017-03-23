@@ -12,7 +12,7 @@ import FileStorage from './storage/FileStorage'
 import SqlDatabase from './storage/SqlDatabase'
 import TripleStore from './storage/TripleStore'
 
-exports.services = {
+exports.Services = {
   ActivityService: ActivityService,
   BackgroundTaskService: BackgroundTaskService,
   ExtensionManager: ExtensionManager,
@@ -21,7 +21,7 @@ exports.services = {
   SettingsManager: SettingsManager
 }
 
-exports.storage = {
+exports.Storages = {
   DocumentDatabase: DocumentDatabase,
   FileStorage: FileStorage,
   SqlDatabase: SqlDatabase,
