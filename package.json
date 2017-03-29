@@ -24,18 +24,27 @@
       "react"
     ],
     "plugins": [
-      ["react-intl", {
-        "messagesDir": "./build/translations",
-        "enforceDescriptions": true
-      }],
+      [
+        "react-intl",
+        {
+          "messagesDir": "./build/translations",
+          "enforceDescriptions": true
+        }
+      ],
       "babel-plugin-transform-flow-strip-types",
       "transform-object-rest-spread"
     ]
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest"
+    }
   },
   "scripts": {
     "postinstall": "npm run compile",
     "compile": "babel --ignore node_modules/ --compact true --source-maps inline --minified --extensions .jsx ./ -d ./",
     "prune": "cd app && npm prune --production",
+    "test": "jest",
     "generate-docs": "jsdoc -c jsdoc.json",
     "lint": "standard \"app/**/*.jsx\"",
     "reformat": "npm run lint || standard \"app/**/*.jsx\" --fix"
@@ -49,13 +58,15 @@
     "pouchdb-quick-search": "^1.3.0",
     "rdfstore": "^0.9.17"
   },
-  "devDependencies":{
+  "devDependencies": {
     "babel-cli": "^6.24.0",
+    "babel-jest": "^19.0.0",
     "babel-plugin-react-intl": "^2.3.1",
     "babel-plugin-transform-flow-strip-types": "^6.22.0",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-preset-es2015": "^6.24.0",
     "babel-preset-react": "^6.23.0",
+    "jest-cli": "^19.0.2",
     "jsdoc": "^3.4.3",
     "jsdoc-babel": "^0.3.0",
     "standard": "^9.0.2"
