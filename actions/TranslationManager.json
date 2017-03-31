@@ -1,0 +1,12 @@
+[{
+  "_id": "_design/translations",
+  "version": "0.1.0",
+  "views": {
+    "all": {
+      "map": "function mapFun (doc) { if (doc.type === 'translation') { emit (doc.id, doc) } }"
+    },
+    "byLocale": {
+      "map": "function mapFun (doc) { if (doc.type === 'translation') { emit (doc.locale, doc) } }"
+    }
+  }
+}]

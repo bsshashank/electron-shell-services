@@ -1,0 +1,18 @@
+[{
+  "_id": "_design/activities",
+  "version": "0.1.0",
+  "views": {
+    "all": {
+      "map": "function mapFun (doc) { if (doc.type === 'activity') { emit (doc.id, doc) } }"
+    },
+    "byType": {
+      "map": "function mapFun (doc) { if (doc.type === 'activity') { emit (doc.type, doc) } }"
+    },
+    "byDate": {
+      "map": "function mapFun (doc) { if (doc.type === 'activitiy') { emit (doc.date, doc) } }"
+    },
+    "byIssuer": {
+      "map": "function mapFun (doc) { if (doc.type === 'activitiy') { emit (doc.issuer, doc) } }"
+    }
+  }
+}]

@@ -1,20 +1,25 @@
 // @flow
 
-import ActivityService from './services/ActivityService'
-import BackgroundTaskService from './services/BackgroundTaskService'
-import ExtensionManager from './services/ExtensionManager'
-import SettingsManager from './services/SettingsManager'
+import ActivityService from './actions/ActivityService'
+import ExtensionManager from './actions/ExtensionManager'
+import SettingManager from './actions/SettingManager'
+import TranslationManager from './actions/TranslationManager'
 
 import DocumentDatabase from './storage/DocumentDatabase'
 import FileStorage from './storage/FileStorage'
 import SqlDatabase from './storage/SqlDatabase'
 import TripleStore from './storage/TripleStore'
 
-exports.Services = {
+import ActivityStore from './stores/ActivityStore'
+import ExtensionStore from './stores/ExtensionStore'
+import SettingStore from './stores/SettingStore'
+import TranslationStore from './stores/TranslationStore'
+
+exports.Actions = {
   ActivityService: ActivityService,
-  BackgroundTaskService: BackgroundTaskService,
   ExtensionManager: ExtensionManager,
-  SettingsManager: SettingsManager
+  SettingManager: SettingManager,
+  TranslationManager: TranslationManager
 }
 
 exports.Storages = {
@@ -22,4 +27,11 @@ exports.Storages = {
   FileStorage: FileStorage,
   SqlDatabase: SqlDatabase,
   TripleStore: TripleStore
+}
+
+exports.Stores = {
+  ActivityStore: ActivityStore,
+  ExtensionStore: ExtensionStore,
+  SettingStore: SettingStore,
+  TranslationStore: TranslationStore
 }

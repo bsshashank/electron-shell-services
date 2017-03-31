@@ -39,7 +39,7 @@ class DocumentDatabase {
    * @param {Object} doc
    * @returns {Promise}
    */
-  save (doc:Object) : Promise<Object> {
+  save (doc:Object) : Promise<*> {
 
     if (!doc._id) {
       doc._id = uuid.v4()
@@ -72,7 +72,7 @@ class DocumentDatabase {
    * @param {string} id
    * @returns {Promise}
    */
-  get (id:string) : Promise<Object> {
+  get (id:string) : Promise<*> {
     return this.db.get(id)
   }
 
@@ -83,8 +83,20 @@ class DocumentDatabase {
    * @param {Object} options
    * @returns {Promise}
    */
-  query(view:string, options:Object) : Promise<Object> {
+  query(view:string, options:Object) : Promise<*> {
     return this.db.query(view, options)
+  }
+
+  /**
+   * [docs description]
+   * @type {[type]}
+   */
+  bulkInsert (docs:Array<Object>) : Promise<*> {
+    let p = new Promise((resolve, reject) => {
+      let items = docs.map((doc) => this.save(doc))
+      Promise.all(items).then(resolve).catch(reject)
+    })
+    return p
   }
 }
 
