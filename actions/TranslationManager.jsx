@@ -53,28 +53,57 @@ const TranslationManager = Reflux.createActions({
   'export': { children: ['completed', 'failed']}
 })
 
+/**
+ * [description]
+ * @param  {[type]} locale [description]
+ * @param  {[type]} docDB  [description]
+ * @return {[type]}        [description]
+ */
 TranslationManager.switchLocale.listen(function (locale:string, docDB:IDocumentDatabase) {
   _initDocumentDatabase(docDB).then(() => {
     _loadTranslations(locale, docDB).then(({ locale, messages }) => {
-      console.log(locale, messages)
       _setNewLocale(locale)
       this.completed(locale, messages)
     }).catch(this.failed)
   }).catch(this.failed)
 })
 
+/**
+ * [description]
+ * @param  {[type]} locale  [description]
+ * @param  {[type]} message [description]
+ * @param  {[type]} docDB   [description]
+ * @return {[type]}         [description]
+ */
 TranslationManager.update.listen(function (locale:string, message:Object, docDB:IDocumentDatabase) {
   _initDocumentDatabase(docDB).then(() => {
 
   }).catch(this.failed)
 })
 
+/**
+ * [description]
+ * @param  {[type]} locale   [description]
+ * @param  {[type]} messages [description]
+ * @param  {[type]} docDB    [description]
+ * @return {[type]}          [description]
+ */
 TranslationManager.import.listen(function (locale:string, messages:Array<Object>, docDB:IDocumentDatabase) {
   _initDocumentDatabase(docDB).then(() => {
-
+    messages.forEach((m) => {
+      m.locale = locale
+      m.type = 'translation'
+    })
+    docDB.bulkInsert(messages).then(this.completed).catch(this.failed)
   }).catch(this.failed)
 })
 
+/**
+ * [description]
+ * @param  {[type]} locale [description]
+ * @param  {[type]} docDB  [description]
+ * @return {[type]}        [description]
+ */
 TranslationManager.export.listen(function (locale:string, docDB:IDocumentDatabase) {
   _initDocumentDatabase(docDB).then(() => {
 
