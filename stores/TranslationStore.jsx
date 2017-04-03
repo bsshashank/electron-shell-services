@@ -3,6 +3,8 @@
 import Reflux from 'reflux'
 import TranslationManager from '../actions/TranslationManager'
 
+import type { TranslationType } from 'electron-shell-lib'
+
 /**
  * [config description]
  * @type {[type]}
@@ -18,13 +20,22 @@ class TranslationsStore extends Reflux.Store {
     this.state = {
       lastError: null,
       locale: 'en',
+      data: [],
       translations: {}
     }
     this.listenables = TranslationManager
   }
 
-  onSwitchLocaleCompleted(locale:string, messages:Array<Object>) {
-    this.setState({ locale: locale, translations: messages })
+  onInitializedCompleted() {
+
+  }
+
+  onInitializedFailed(err:Object) {
+    this.setState({ lastError: err })
+  }
+
+  onSwitchLocaleCompleted(locale:string, rows: Array<TranslationType>, messages:Object) {
+    this.setState({ locale: locale, data:rows, translations: messages })
   }
 
   onSwitchLocaleFailed(err:Object) {

@@ -6,20 +6,26 @@ import { addLocaleData } from 'react-intl'
 
 import viewSpecs from './TranslationManager.json'
 
-import type { IDocumentDatabase } from 'electron-shell'
+import type { TranslationType, IDocumentDatabase } from 'electron-shell'
 
-const _initDocumentDatabase = (docDB:IDocumentDatabase):Promise<Object> => {
-  return docDB.bulkInsert(viewSpecs)
-}
+let _docDB: IDocumentDatabase
 
-const _loadTranslations = (locale:string, docDB:IDocumentDatabase): Promise<*> => {
+/**
+ *
+ * @param {*} locale
+ * @param {*} docDB
+ */
+const _loadTranslations = (locale: string): Promise<*> => {
   let p = new Promise((resolve, reject) => {
-    docDB.query('translations/byLocale', { key: locale, include_docs: true }).then((translations) => {
+    if (!_docDB) reject('ERR_NOT_INITIALISED')
+    _docDB.query('translations/byLocale', { key: locale }).then(({ rows }) => {
       let messages = {}
-      translations.rows.forEach((row) => {
-        messages[row.id] = row.doc.translation || row.doc.defaultMessage
+      let items = []
+      rows.forEach((row) => {
+        messages[row.id] = row.value.translation || row.value.defaultMessage
+        items.push(row.value)
       })
-      resolve({ locale, messages })
+      resolve({ locale, items, messages })
     }).catch((err) => {
       reject(err)
     })
@@ -27,7 +33,11 @@ const _loadTranslations = (locale:string, docDB:IDocumentDatabase): Promise<*> =
   return p
 }
 
-const _setNewLocale = (locale:string) => {
+/**
+ *
+ * @param {*} locale
+ */
+const _setNewLocale = (locale: string) => {
   const idx = locale.indexOf('-')
   if (idx !== -1) {
     locale = locale.substr(0, idx)
@@ -36,78 +46,54 @@ const _setNewLocale = (locale:string) => {
     const locale_data = require(`react-intl/locale-data/${locale}`)
     addLocaleData([...locale_data])
   }
-  catch(err) {
+  catch (err) {
     console.log(`Could not load locale ${locale}`)
     throw 'ERR_SWITCH_LOCALE'
   }
 }
 
 /**
- * [TranslationManagerActions description]
- * @type {[type]}
+ *
  */
 const TranslationManager = Reflux.createActions({
-  'switchLocale': { children: ['completed', 'failed']},
-  'update': { children: ['completed', 'failed']},
-  'import': { children: ['completed', 'failed']},
-  'export': { children: ['completed', 'failed']}
+  'initialize': { children: ['completed', 'failed'] },
+  'switchLocale': { children: ['completed', 'failed'] },
+  'update': { children: ['completed', 'failed'] },
+  'import': { children: ['completed', 'failed'] },
+  'export': { children: ['completed', 'failed'] }
 })
 
-/**
- * [description]
- * @param  {[type]} locale [description]
- * @param  {[type]} docDB  [description]
- * @return {[type]}        [description]
- */
-TranslationManager.switchLocale.listen(function (locale:string, docDB:IDocumentDatabase) {
-  _initDocumentDatabase(docDB).then(() => {
-    _loadTranslations(locale, docDB).then(({ locale, messages }) => {
-      _setNewLocale(locale)
-      this.completed(locale, messages)
-    }).catch(this.failed)
+TranslationManager.initialize.listen(function (docDB: IDocumentDatabase) {
+  _docDB = docDB
+  _docDB.bulkInsert(viewSpecs).then(this.completed).catch(this.failed)
+})
+
+TranslationManager.switchLocale.listen(function (locale: string) {
+  if (!_docDB)
+    this.failed('ERR_NOT_INITIALISED')
+  _loadTranslations(locale).then(({ locale, items, messages }) => {
+    _setNewLocale(locale)
+    this.completed(locale, items, messages)
   }).catch(this.failed)
 })
 
-/**
- * [description]
- * @param  {[type]} locale  [description]
- * @param  {[type]} message [description]
- * @param  {[type]} docDB   [description]
- * @return {[type]}         [description]
- */
-TranslationManager.update.listen(function (locale:string, message:Object, docDB:IDocumentDatabase) {
-  _initDocumentDatabase(docDB).then(() => {
-
-  }).catch(this.failed)
+TranslationManager.update.listen(function (locale: string, message: TranslationType) {
+  if (!_docDB)
+    this.failed('ERR_NOT_INITIALISED')
 })
 
-/**
- * [description]
- * @param  {[type]} locale   [description]
- * @param  {[type]} messages [description]
- * @param  {[type]} docDB    [description]
- * @return {[type]}          [description]
- */
-TranslationManager.import.listen(function (locale:string, messages:Array<Object>, docDB:IDocumentDatabase) {
-  _initDocumentDatabase(docDB).then(() => {
-    messages.forEach((m) => {
-      m.locale = locale
-      m.type = 'translation'
-    })
-    docDB.bulkInsert(messages).then(this.completed).catch(this.failed)
-  }).catch(this.failed)
+TranslationManager.import.listen(function (locale: string, messages: Array<TranslationType>) {
+  if (!_docDB)
+    this.failed('ERR_NOT_INITIALISED')
+  messages.forEach((m) => {
+    m.locale = locale
+  })
+  _docDB.bulkInsert(messages).then(this.completed).catch(this.failed)
 })
 
-/**
- * [description]
- * @param  {[type]} locale [description]
- * @param  {[type]} docDB  [description]
- * @return {[type]}        [description]
- */
-TranslationManager.export.listen(function (locale:string, docDB:IDocumentDatabase) {
-  _initDocumentDatabase(docDB).then(() => {
-
-  }).catch(this.failed)
+TranslationManager.export.listen(function (locale: string) {
+  if (!_docDB)
+    this.failed('ERR_NOT_INITIALISED')
 })
 
 export default TranslationManager

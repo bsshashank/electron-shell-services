@@ -4,22 +4,15 @@ import Reflux from 'reflux'
 
 import viewSpecs from './ActivityService.json'
 
-import type { IDocumentDatabase } from 'electron-shell'
+import type { EventType, IDocumentDatabase } from 'electron-shell'
+
+let _docDB: IDocumentDatabase
 
 /**
- * [_initDocumentDatabase description]
- * @param  {[type]} docDB [description]
- * @return {[type]}       [description]
- */
-const _initDocumentDatabase = (docDB:IDocumentDatabase):Promise<*> => {
-  return docDB.bulkInsert(viewSpecs)
-}
-
-/**
- * [ActivityService description]
- * @type {[type]}
+ *  Handling and managing activities done in the application
  */
 const ActivityService = Reflux.createActions({
+  'initialize': { children: ['completed', 'failed'] },
   'getByType': { children: ['completed', 'failed'] },
   'getByDateRange': { children: ['completed', 'failed'] },
   'getByIssuer': { children: ['completed', 'failed'] },
@@ -28,64 +21,40 @@ const ActivityService = Reflux.createActions({
 })
 
 /**
- * [description]
- * @param  {[type]} type  [description]
- * @param  {[type]} docDB [description]
- * @return {[type]}       [description]
+ *
+ * @param  {IDocumentDatabase} type  [description]
  */
-ActivityService.getByType.listen(function (type:string, docDB:IDocumentDatabase) {
-  _initDocumentDatabase(docDB).then(() => {
-
-  }).catch(this.failed)
+ActivityService.initialize.listen(function (docDB: IDocumentDatabase) {
+  _docDB = docDB
+  _docDB.bulkInsert(viewSpecs).then(this.completed).catch(this.failed)
 })
 
 /**
- * [description]
- * @param  {[type]} from  [description]
- * @param  {[type]} to    [description]
- * @param  {[type]} docDB [description]
- * @return {[type]}       [description]
+ *
  */
-ActivityService.getByDateRange.listen(function (from:Date, to:Date, docDB:IDocumentDatabase) {
-  _initDocumentDatabase(docDB).then(() => {
-
-  }).catch(this.failed)
+ActivityService.getByType.listen(function (type: string) {
+  if (!_docDB)
+    this.failed('ERR_NOT_INITIALISED')
 })
 
-/**
- * [description]
- * @param  {[type]} issuer [description]
- * @param  {[type]} docDB  [description]
- * @return {[type]}        [description]
- */
-ActivityService.getByIssuer.listen(function (issuer:string, docDB:IDocumentDatabase) {
-  _initDocumentDatabase(docDB).then(() => {
-
-  }).catch(this.failed)
+ActivityService.getByDateRange.listen(function (from: Date, to: Date) {
+  if (!_docDB)
+    this.failed('ERR_NOT_INITIALISED')
 })
 
-/**
- * [description]
- * @param  {[type]} filter [description]
- * @param  {[type]} docDB  [description]
- * @return {[type]}        [description]
- */
-ActivityService.find.listen(function (filter:Object, docDB:IDocumentDatabase) {
-  _initDocumentDatabase(docDB).then(() => {
-
-  }).catch(this.failed)
+ActivityService.getByIssuer.listen(function (issuer: string) {
+  if (!_docDB)
+    this.failed('ERR_NOT_INITIALISED')
 })
 
-/**
- * [description]
- * @param  {[type]} event [description]
- * @param  {[type]} docDB [description]
- * @return {[type]}       [description]
- */
-ActivityService.create.listen(function (event:Object, docDB:IDocumentDatabase) {
-  _initDocumentDatabase(docDB).then(() => {
+ActivityService.find.listen(function (filter: Object) {
+  if (!_docDB)
+    this.failed('ERR_NOT_INITIALISED')
+})
 
-  }).catch(this.failed)
+ActivityService.create.listen(function (event: EventType) {
+  if (!_docDB)
+    this.failed('ERR_NOT_INITIALISED')
 })
 
 export default ActivityService
