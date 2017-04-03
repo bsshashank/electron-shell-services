@@ -1,12 +1,17 @@
 [{
   "_id": "_design/translations",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "views": {
-    "all": {
-      "map": "function mapFun (doc) { if (doc.type === 'translation') { emit (doc.id, doc) } }"
-    },
     "byLocale": {
-      "map": "function mapFun (doc) { if (doc.type === 'translation') { emit (doc.locale, doc) } }"
+      "map": "function mapFun(doc) {\n    if (doc.type === 'translation') {\n        emit(doc.locale, { data: doc, intl: { [doc._id]: doc.translation } })\n    }\n}",
+      "reduce": "function (keys, values, rereduce) {\n  if (rereduce) {\n    return values;\n  } else {\n    let dataItems = values.map(v => v.data)\n    let intls = {}\n    values.forEach(v => Object.assign(intls, v.intl))\n    return { data: dataItems, intl: intls };\n  }\n}"
+    },
+    "availableLocales": {
+      "map": "function mapFun (doc) { if (doc.type === 'translation') { emit (doc.locale, 1) } }",
+      "reduce": "_count"
+    },
+    "byID": {
+      "map": "function mapFun(doc) {\n    if (doc.type === 'translation') {\n        emit(doc.id, doc)\n    }\n}"
     }
   }
 }]

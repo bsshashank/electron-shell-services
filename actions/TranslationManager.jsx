@@ -18,14 +18,9 @@ let _docDB: IDocumentDatabase
 const _loadTranslations = (locale: string): Promise<*> => {
   let p = new Promise((resolve, reject) => {
     if (!_docDB) reject('ERR_NOT_INITIALISED')
-    _docDB.query('translations/byLocale', { key: locale }).then(({ rows }) => {
-      let messages = {}
-      let items = []
-      rows.forEach((row) => {
-        messages[row.id] = row.value.translation || row.value.defaultMessage
-        items.push(row.value)
-      })
-      resolve({ locale, items, messages })
+    _docDB.query('translations/byLocale', { key: locale, reduce: true, group: true }).then(({ rows }) => {
+      let localeData = rows[0].value
+      resolve({ locale, localeData })
     }).catch((err) => {
       reject(err)
     })
@@ -65,15 +60,20 @@ const TranslationManager = Reflux.createActions({
 
 TranslationManager.initialize.listen(function (docDB: IDocumentDatabase) {
   _docDB = docDB
-  _docDB.bulkInsert(viewSpecs).then(this.completed).catch(this.failed)
+  _docDB.bulkInsert(viewSpecs).then(() => {
+    _docDB.query('translations/availableLocales', { reduce: '_count', group: true }).then(({ rows }) => {
+      let availableLocales = rows.map(r => r.key)
+      this.completed(availableLocales)
+    }).catch(this.failed)
+  }).catch(this.failed)
 })
 
 TranslationManager.switchLocale.listen(function (locale: string) {
   if (!_docDB)
     this.failed('ERR_NOT_INITIALISED')
-  _loadTranslations(locale).then(({ locale, items, messages }) => {
+  _loadTranslations(locale).then(({ locale, localeData }) => {
     _setNewLocale(locale)
-    this.completed(locale, items, messages)
+    this.completed(locale, localeData)
   }).catch(this.failed)
 })
 

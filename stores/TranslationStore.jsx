@@ -20,25 +20,27 @@ class TranslationsStore extends Reflux.Store {
     this.state = {
       lastError: null,
       locale: 'en',
-      data: [],
-      translations: {}
+      availableLocales: [],
+      localeData: { data: [], intl: {} }
     }
     this.listenables = TranslationManager
   }
 
-  onInitializedCompleted() {
-
+  onInitializeCompleted(availableLocales:Array<string>) {
+    this.setState({ availableLocales: availableLocales })
   }
 
-  onInitializedFailed(err:Object) {
+  onInitializeFailed(err:Object) {
+    console.log(err)
     this.setState({ lastError: err })
   }
 
-  onSwitchLocaleCompleted(locale:string, rows: Array<TranslationType>, messages:Object) {
-    this.setState({ locale: locale, data:rows, translations: messages })
+  onSwitchLocaleCompleted(locale:string, localeData:Object) {
+    this.setState({ locale: locale, localeData: localeData })
   }
 
   onSwitchLocaleFailed(err:Object) {
+    console.log(err)
     this.setState({ lastError: err })
   }
 
@@ -47,6 +49,7 @@ class TranslationsStore extends Reflux.Store {
   }
 
   onUpdateFailed(err:Object) {
+    console.log(err)
     this.setState({ lastError: err })
   }
 
@@ -55,6 +58,7 @@ class TranslationsStore extends Reflux.Store {
   }
 
   onImportFailed(err:Object) {
+    console.log(err)
     this.setState({ lastError: err })
   }
 
@@ -63,6 +67,7 @@ class TranslationsStore extends Reflux.Store {
   }
 
   onExportFailed(err:Object) {
+    console.log(err)
     this.setState({ lastError: err })
   }
 }
