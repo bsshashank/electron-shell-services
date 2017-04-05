@@ -13,7 +13,6 @@ let _docDB: IDocumentDatabase
 /**
  *
  * @param {*} locale
- * @param {*} docDB
  */
 const _loadTranslations = (locale: string): Promise<*> => {
   let p = new Promise((resolve, reject) => {
