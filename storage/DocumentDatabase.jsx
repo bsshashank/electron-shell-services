@@ -5,13 +5,15 @@ import uuid from 'uuid'
 PouchDB.plugin(require('pouchdb-find'))
 PouchDB.plugin(require('pouchdb-quick-search'))
 
+import type { ApplicationConfig, DocumentDatabaseLookupOptions, DocumentDatabaseQueryOptions, IDocumentDatabase } from 'electron-shell'
+
 /**
  * Provides access to a document-style database
  * that stores JSON docs and allows to index and query for them.
  *
  * @class DocumentDatabase
  */
-class DocumentDatabase {
+class DocumentDatabase implements IDocumentDatabase {
 
   /**
    *
@@ -34,13 +36,14 @@ class DocumentDatabase {
   }
 
   /**
+   * stores a document object into the database
    *
+   * @param {Object} doc the document that should be persisted into the database
+   * @returns {Promise} a promise object signalling either success or failure of the operation
    *
-   * @param {Object} doc
-   * @returns {Promise}
+   * @memberOf IDocumentDatabase
    */
-  save (doc:Object) : Promise<*> {
-
+  save(doc: Object): Promise<*> {
     if (!doc._id) {
       doc._id = uuid.v4()
     }
@@ -67,36 +70,57 @@ class DocumentDatabase {
   }
 
   /**
+   * lookup a document from the database by it's unique id
    *
+   * @param {string} id the unique id of the document to be retrieved
+     * @param {DocumentDatabaseLookupOptions} options the options object with additional parameters for the database lookup
+   * @returns {Promise} a promise object signalling either success or failure of the operation
    *
-   * @param {string} id
-   * @returns {Promise}
+   * @memberOf IDocumentDatabase
    */
-  get (id:string) : Promise<*> {
-    return this.db.get(id)
+  lookup(id:string, options:?DocumentDatabaseLookupOptions): Promise<*> {
+    return this.db.get(id, options)
   }
 
   /**
+   * queries a specific view in the database with some search options
    *
+   * @param {string} view the name of the view in the database to use
+   * @param {DocumentDatabaseQueryOptions} options the options object with additional parameters for the querying the view
+   * @returns {Promise} a promise object signalling either success or failure of the operation
    *
-   * @param {string} view
-   * @param {Object} options
-   * @returns {Promise}
+   * @memberOf IDocumentDatabase
    */
-  query(view:string, options:Object) : Promise<*> {
+  query(view:string, options:?DocumentDatabaseQueryOptions): Promise<*> {
     return this.db.query(view, options)
   }
 
   /**
-   * [docs description]
-   * @type {[type]}
+   * inserts multiple objects as bulk into the database
+   *
+   * @param {Array<Object>} docs the array of documents to insert into the database
+   * @returns {Promise} a promise object signalling either success or failure of the operation
+   *
+   * @memberOf IDocumentDatabase
    */
-  bulkInsert (docs:Array<Object>) : Promise<*> {
+  bulkInsert(docs:Array<Object>): Promise<*> {
     let p = new Promise((resolve, reject) => {
       let items = docs.map((doc) => this.save(doc))
       Promise.all(items).then(resolve).catch(reject)
     })
     return p
+  }
+
+  /**
+   * removes an object from the database
+   *
+   * @param {string} id the unique id of the document to be removed
+   * @returns {Promise} a promise object signalling either success or failure of the operation
+   *
+   * @memberOf IDocumentDatabase
+   */
+  remove(id:string): Promise<*> {
+    return this.db.remove(id)
   }
 }
 

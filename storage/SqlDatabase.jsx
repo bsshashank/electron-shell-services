@@ -1,12 +1,14 @@
 // @flow
 import lf from 'lovefield'
 
+import type { ISqlDatabase } from 'electron-shell'
+
 /**
  *  Provides access to a SQLite-style database API.
  *
  * @class SqlDatabase
  */
-class SqlDatabase {
+class SqlDatabase implements ISqlDatabase {
 
   db: Object
 
