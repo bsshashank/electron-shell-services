@@ -2,11 +2,11 @@
 
 import path from 'path'
 import fs from 'fs'
-import ncp from 'ncp'
+import { ncp } from 'ncp'
 import mime from 'mime'
 import glob from 'glob-promise'
 
-import type { ApplicationConfig, IFileStorage, FileStorageIterationResult } from 'electron-shell'
+import type { ApplicationConfig, IFileStorage, FileStorageIterationResult } from 'electron-shell-lib'
 
 /**
  * Provides access to and manages a local storage
@@ -134,14 +134,30 @@ class FileStorage implements IFileStorage {
   /**
    * uploads a file to the file storage
    *
-   * @param {string} fileUri the uri to the original file
+   * @param {string} fileHandle the file object of the original file
    * @param {string} location the final location of the file in the file storage relative to the base folder
    * @returns {Promise} a promise object signalling either success or failure of the operation
    *
    */
-  upload(fileUri: string, location: string): Promise<*> {
+  upload(fileHandle: File, location: string): Promise<*> {
     let promise = new Promise((resolve, reject) => {
+      process.noAsar = true
+      const fsName = path.basename(fileHandle.path)
 
+      let fsReadStream = fs.createReadStream(fileHandle.path)
+      let fsWriteStream = fs.createWriteStream(path.join(location, fsName))
+      fsReadStream.pipe(fsWriteStream)
+
+      fsWriteStream.on('error', (err) => {
+        process.noAsar = false
+        reject(err)
+      })
+
+      fsWriteStream.on('close', (err) => {
+        process.noAsar = false
+        if (err) reject(err)
+        resolve({ location: location, file: fsName })
+      })
     })
 
     return promise

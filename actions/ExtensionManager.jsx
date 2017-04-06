@@ -5,10 +5,11 @@ import Reflux from 'reflux'
 import path from 'path'
 import fs from 'fs'
 
+import { utils } from 'electron-shell-lib'
+
 import viewSpecs from './ExtensionManager.json'
 
-import { extensionLoader } from 'electron-shell-lib'
-import type { IExtension, IFileStorage, IDocumentDatabase } from 'electron-shell'
+import type { IExtension, IFileStorage, IDocumentDatabase } from 'electron-shell-lib'
 
 let _docDB: IDocumentDatabase
 let _fileStorage: IFileStorage
@@ -49,22 +50,32 @@ ExtensionManager.mountAll.listen(function () {
     this.failed('ERR_NOT_INITIALISED')
 })
 
-ExtensionManager.activate.listen(function (extension: string) {
+ExtensionManager.activate.listen(function (extName: string) {
   if ((!_docDB) || (!_fileStorage) || (!_extensionFolder))
     this.failed('ERR_NOT_INITIALISED')
 })
 
-ExtensionManager.deactivate.listen(function (extension: string) {
+ExtensionManager.deactivate.listen(function (extName: string) {
   if ((!_docDB) || (!_fileStorage) || (!_extensionFolder))
     this.failed('ERR_NOT_INITIALISED')
 })
 
-ExtensionManager.install.listen(function (extension: string) {
+ExtensionManager.install.listen(function (extName: string, extPackage: File) {
   if ((!_docDB) || (!_fileStorage) || (!_extensionFolder))
     this.failed('ERR_NOT_INITIALISED')
+  // copy package file over to the file store
+  _fileStorage.upload(extPackage, _extensionFolder).then(({ location, file }) => {
+    // register package file in database (ExtensionType)
+    // try to load package to get informations
+    let extension: IExtension = utils.extensionLoader.tryLoadExtension(location, file)
+    console.log(extension)
+  }).catch((err) => {
+    console.log(err)
+    this.failed(err)
+  })
 })
 
-ExtensionManager.uninstall.listen(function (extension: string) {
+ExtensionManager.uninstall.listen(function (extName: string) {
   if ((!_docDB) || (!_fileStorage) || (!_extensionFolder))
     this.failed('ERR_NOT_INITIALISED')
 })

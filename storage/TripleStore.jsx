@@ -1,7 +1,7 @@
 // @flow
 import { Store } from 'rdfstore'
 
-import type { ITripleStore } from 'electron-shell'
+import type { ITripleStore } from 'electron-shell-lib'
 
 /**
  * Provides access to a RDF triple store (aka graph-style database).

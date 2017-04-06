@@ -4,7 +4,7 @@ import Reflux from 'reflux'
 
 import viewSpecs from './SettingManager.json'
 
-import type { SettingType, IDocumentDatabase } from 'electron-shell'
+import type { SettingType, IDocumentDatabase } from 'electron-shell-lib'
 
 let _docDB: IDocumentDatabase
 

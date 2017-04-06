@@ -4,7 +4,7 @@ import Reflux from 'reflux'
 
 import viewSpecs from './ActivityService.json'
 
-import type { EventType, IDocumentDatabase } from 'electron-shell'
+import type { EventType, IDocumentDatabase } from 'electron-shell-lib'
 
 let _docDB: IDocumentDatabase
 

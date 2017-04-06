@@ -6,7 +6,7 @@ import { addLocaleData } from 'react-intl'
 
 import viewSpecs from './TranslationManager.json'
 
-import type { TranslationType, IDocumentDatabase } from 'electron-shell'
+import type { TranslationType, IDocumentDatabase } from 'electron-shell-lib'
 
 let _docDB: IDocumentDatabase
 

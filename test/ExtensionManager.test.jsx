@@ -1,4 +1,4 @@
-import type { ApplicationConfig, IFileStorage } from 'electron-shell'
+import type { ApplicationConfig, IFileStorage } from 'electron-shell-lib'
 import FileStorage from '../storage/FileStorage'
 import ExtensionManager from '../services/ExtensionManager'
 
@@ -35,7 +35,7 @@ describe('File Storage Test', () => {
     test.skip('initialized ExtensionManager', () => {
         console.log("Test: Initialize Extension Manager")
         let extensionManager = new ExtensionManager(testAppConfig, fileStorage)
-        
+
         extensionInfo = extensionManager._tryLoadExtension("hello.asar");
         console.log(extensionInfo);
     });

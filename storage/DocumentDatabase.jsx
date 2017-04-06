@@ -5,7 +5,7 @@ import uuid from 'uuid'
 PouchDB.plugin(require('pouchdb-find'))
 PouchDB.plugin(require('pouchdb-quick-search'))
 
-import type { ApplicationConfig, DocumentDatabaseLookupOptions, DocumentDatabaseQueryOptions, IDocumentDatabase } from 'electron-shell'
+import type { ApplicationConfig, DocumentDatabaseLookupOptions, DocumentDatabaseQueryOptions, IDocumentDatabase } from 'electron-shell-lib'
 
 /**
  * Provides access to a document-style database
