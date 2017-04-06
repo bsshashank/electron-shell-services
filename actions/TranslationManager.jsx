@@ -1,6 +1,8 @@
 // @flow
 
 import Reflux from 'reflux'
+import RefluxPromise from 'reflux-promise'
+Reflux.use(RefluxPromise(Promise))
 
 import { addLocaleData } from 'react-intl'
 
@@ -50,11 +52,11 @@ const _setNewLocale = (locale: string) => {
  *
  */
 const TranslationManager = Reflux.createActions({
-  'initialize': { children: ['completed', 'failed'] },
-  'switchLocale': { children: ['completed', 'failed'] },
-  'update': { children: ['completed', 'failed'] },
-  'import': { children: ['completed', 'failed'] },
-  'export': { children: ['completed', 'failed'] }
+  'initialize': { asyncResult: true },
+  'switchLocale': { asyncResult: true },
+  'update': { asyncResult: true },
+  'import': { asyncResult: true },
+  'export': { asyncResult: true }
 })
 
 TranslationManager.initialize.listen(function (docDB: IDocumentDatabase) {

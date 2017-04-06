@@ -1,6 +1,8 @@
 // @flow
 
 import Reflux from 'reflux'
+import RefluxPromise from 'reflux-promise'
+Reflux.use(RefluxPromise(Promise))
 
 import path from 'path'
 import fs from 'fs'
@@ -22,12 +24,12 @@ let _extensionFolder: string
  * @type {[type]}
  */
 const ExtensionManager = Reflux.createActions({
-  'initialize': { children: ['completed', 'failed'] },
-  'mountAll': { children: ['completed', 'failed'] },
-  'activate': { children: ['completed', 'failed'] },
-  'deactivate': { children: ['completed', 'failed'] },
-  'install': { children: ['completed', 'failed'] },
-  'uninstall': { children: ['completed', 'failed'] }
+  'initialize': { asyncResult: true },
+  'mountAll': { asyncResult: true },
+  'activate': { asyncResult: true },
+  'deactivate': { asyncResult: true },
+  'install': { asyncResult: true },
+  'uninstall': { asyncResult: true }
 })
 
 ExtensionManager.initialize.listen(function (fileStorage: IFileStorage, docDB: IDocumentDatabase,
@@ -53,6 +55,10 @@ ExtensionManager.initialize.listen(function (fileStorage: IFileStorage, docDB: I
 ExtensionManager.mountAll.listen(function () {
   if ((!_docDB) || (!_fileStorage) || (!_extensionFolder))
     this.failed('ERR_NOT_INITIALISED')
+  _docDB.query('extensions/byStatus', { key: 'active '}).then(({ rows }) => {
+    console.log(rows)
+    this.completed(rows)
+  }).catch(this.failed)
 })
 
 ExtensionManager.activate.listen(function (extName: string) {
@@ -81,7 +87,7 @@ ExtensionManager.install.listen(function (extName: string, extPackage: File) {
       author: extension.author,
       route: extension.initialRoute,
       bannerImage: extension.bannerImage,
-      state: 'deactive',
+      status: 'deactive',
       type: 'extension'
     }
     console.log(extInfo)

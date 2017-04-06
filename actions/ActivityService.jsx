@@ -1,6 +1,8 @@
 // @flow
 
 import Reflux from 'reflux'
+import RefluxPromise from 'reflux-promise'
+Reflux.use(RefluxPromise(Promise))
 
 import viewSpecs from './ActivityService.json'
 
@@ -12,12 +14,12 @@ let _docDB: IDocumentDatabase
  *  Handling and managing activities done in the application
  */
 const ActivityService = Reflux.createActions({
-  'initialize': { children: ['completed', 'failed'] },
-  'getByType': { children: ['completed', 'failed'] },
-  'getByDateRange': { children: ['completed', 'failed'] },
-  'getByIssuer': { children: ['completed', 'failed'] },
-  'find': { children: ['completed', 'failed'] },
-  'create': { children: ['completed', 'failed'] }
+  'initialize': { asyncResult: true },
+  'getByType': { asyncResult: true },
+  'getByDateRange': { asyncResult: true },
+  'getByIssuer': { asyncResult: true },
+  'find': { asyncResult: true },
+  'create': { asyncResult: true }
 })
 
 /**

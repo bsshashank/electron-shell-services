@@ -2,9 +2,6 @@
   "_id": "_design/extensions",
   "version": "0.1.0",
   "views": {
-    "all": {
-      "map": "function mapFun (doc) { if (doc.type === 'extension') { emit (doc.id, doc) } }"
-    },
     "byStatus": {
       "map": "function mapFun (doc) { if (doc.type === 'extension') { emit (doc.status, doc) } }"
     }

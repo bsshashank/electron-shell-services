@@ -1,6 +1,8 @@
 // @flow
 
 import Reflux from 'reflux'
+import RefluxPromise from 'reflux-promise'
+Reflux.use(RefluxPromise(Promise))
 
 import viewSpecs from './SettingManager.json'
 
@@ -13,11 +15,11 @@ let _docDB: IDocumentDatabase
  * @type {[type]}
  */
 const SettingManager = Reflux.createActions({
-  'initialize': { children: ['completed', 'failed'] },
-  'getByExtension': { children: ['completed', 'failed'] },
-  'update': { children: ['completed', 'failed'] },
-  'import': { children: ['completed', 'failed'] },
-  'export': { children: ['completed', 'failed'] }
+  'initialize': { asyncResult: true },
+  'getByExtension': { asyncResult: true },
+  'update': { asyncResult: true },
+  'import': { asyncResult: true },
+  'export': { asyncResult: true }
 })
 
 SettingManager.initialize.listen(function (docDB: IDocumentDatabase) {
