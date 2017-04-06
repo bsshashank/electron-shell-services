@@ -21,6 +21,14 @@ class ExtensionStore extends Reflux.Store {
       extensions: []
     }
   }
+
+  onInstallCompleted (extension) {
+    this.setState({ lastError: null, extensions: [ extension, ...this.extensions ] })
+  }
+
+  onInstallFailed (err) {
+    this.setState({ lastError: err })
+  }
 }
 
 export default ExtensionStore

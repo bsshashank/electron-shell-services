@@ -9,10 +9,12 @@ import { utils } from 'electron-shell-lib'
 
 import viewSpecs from './ExtensionManager.json'
 
-import type { IExtension, IFileStorage, IDocumentDatabase } from 'electron-shell-lib'
+import type { ExtensionInfoType, IExtension, IFileStorage, IDocumentDatabase, ISettingManager, ITranslationManager } from 'electron-shell-lib'
 
 let _docDB: IDocumentDatabase
 let _fileStorage: IFileStorage
+let _settingManager: ISettingManager
+let _translationManager: ITranslationManager
 let _extensionFolder: string
 
 /**
@@ -28,9 +30,12 @@ const ExtensionManager = Reflux.createActions({
   'uninstall': { children: ['completed', 'failed'] }
 })
 
-ExtensionManager.initialize.listen(function (fileStorage: IFileStorage, docDB: IDocumentDatabase) {
+ExtensionManager.initialize.listen(function (fileStorage: IFileStorage, docDB: IDocumentDatabase,
+                        settingManager: ISettingManager, translationManager: ITranslationManager) {
   _fileStorage = fileStorage
   _docDB = docDB
+  _settingManager = settingManager
+  _translationManager = translationManager
   _docDB.bulkInsert(viewSpecs).then(() => {
     _extensionFolder = path.join(fileStorage.baseFolder, 'Plugins')
     if (!fs.existsSync(_extensionFolder)) {
@@ -63,16 +68,29 @@ ExtensionManager.deactivate.listen(function (extName: string) {
 ExtensionManager.install.listen(function (extName: string, extPackage: File) {
   if ((!_docDB) || (!_fileStorage) || (!_extensionFolder))
     this.failed('ERR_NOT_INITIALISED')
-  // copy package file over to the file store
+
+  let extInfo: ExtensionInfoType
   _fileStorage.upload(extPackage, _extensionFolder).then(({ location, file }) => {
-    // register package file in database (ExtensionType)
-    // try to load package to get informations
     let extension: IExtension = utils.extensionLoader.tryLoadExtension(location, file)
     console.log(extension)
-  }).catch((err) => {
-    console.log(err)
-    this.failed(err)
-  })
+    extInfo = {
+      _id: extension.id,
+      name: extension.name,
+      description: extension.description,
+      version: extension.version,
+      author: extension.author,
+      route: extension.initialRoute,
+      bannerImage: extension.bannerImage,
+      state: 'deactive',
+      type: 'extension'
+    }
+    console.log(extInfo)
+    return extension.register(_settingManager, _translationManager)
+  }).then(() => {
+    return _docDB.save(extInfo)
+  }).then(() => {
+    this.completed(extInfo)
+  }).catch(this.failed)
 })
 
 ExtensionManager.uninstall.listen(function (extName: string) {
