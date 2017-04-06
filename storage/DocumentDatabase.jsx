@@ -78,7 +78,7 @@ class DocumentDatabase implements IDocumentDatabase {
    *
    * @memberOf IDocumentDatabase
    */
-  lookup(id:string, options:?DocumentDatabaseLookupOptions): Promise<*> {
+  lookup(id:string, options?:DocumentDatabaseLookupOptions): Promise<*> {
     return this.db.get(id, options)
   }
 
@@ -91,7 +91,7 @@ class DocumentDatabase implements IDocumentDatabase {
    *
    * @memberOf IDocumentDatabase
    */
-  query(view:string, options:?DocumentDatabaseQueryOptions): Promise<*> {
+  query(view:string, options?:DocumentDatabaseQueryOptions): Promise<*> {
     return this.db.query(view, options)
   }
 
