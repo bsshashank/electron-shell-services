@@ -22,9 +22,18 @@ const _loadTranslations = (locale: string): Promise<*> => {
     _docDB.query('translations/byLocale', { key: locale, reduce: true, group: true }).then(({ rows }) => {
       let localeData = rows[0].value
       resolve({ locale, localeData })
-    }).catch((err) => {
-      reject(err)
-    })
+    }).catch(reject)
+  })
+  return p
+}
+
+const _loadAvailableLocales = (): Promise<*> => {
+  let p = new Promise((resolve, reject) => {
+    if (!_docDB) reject('ERR_NOT_INITIALISED')
+    _docDB.query('translations/availableLocales', { reduce: '_count', group: true }).then(({ rows }) => {
+      let availableLocales = rows.map(r => r.key)
+      resolve({ availableLocales })
+    }).catch(reject)
   })
   return p
 }
@@ -62,10 +71,9 @@ const TranslationManager = Reflux.createActions({
 TranslationManager.initialize.listen(function (docDB: IDocumentDatabase) {
   _docDB = docDB
   _docDB.bulkInsert(viewSpecs).then(() => {
-    _docDB.query('translations/availableLocales', { reduce: '_count', group: true }).then(({ rows }) => {
-      let availableLocales = rows.map(r => r.key)
-      this.completed(availableLocales)
-    }).catch(this.failed)
+    return _loadAvailableLocales()
+  }).then(({ availableLocales }) => {
+    this.completed(availableLocales)
   }).catch(this.failed)
 })
 
@@ -89,7 +97,9 @@ TranslationManager.import.listen(function (locale: string, messages: Array<Trans
   messages.forEach((m) => {
     m.locale = locale
   })
-  _docDB.bulkInsert(messages).then(this.completed).catch(this.failed)
+  _docDB.bulkInsert(messages).then(() => {
+    this.completed(locale, messages)
+  }).catch(this.failed)
 })
 
 TranslationManager.export.listen(function (locale: string) {

@@ -87,6 +87,7 @@ ExtensionManager.install.listen(function (extName: string, extPackage: File) {
       author: extension.author,
       route: extension.initialRoute,
       bannerImage: extension.bannerImage,
+      hasSettings: (extension.settingView !== null),
       status: 'deactive',
       type: 'extension'
     }

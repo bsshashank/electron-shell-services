@@ -25,10 +25,11 @@ class ExtensionStore extends Reflux.Store {
   }
 
   onInstallCompleted (extension: ExtensionInfoType) {
-    this.setState({ lastError: null, extensions: [ extension, ...this.extensions ] })
+    this.setState({ lastError: null, extensions: [extension, ...this.state.extensions] })
   }
 
-  onInstallFailed (err) {
+  onInstallFailed (err:Object) {
+    console.log(err)
     this.setState({ lastError: err })
   }
 
@@ -36,7 +37,8 @@ class ExtensionStore extends Reflux.Store {
     this.setState({ lastError: null, extensions: extensions })
   }
 
-  onMountAllFailed(err) {
+  onMountAllFailed(err:Object) {
+    console.log(err)
     this.setState({ lastError: err })
   }
 }
