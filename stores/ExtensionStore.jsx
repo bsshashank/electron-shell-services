@@ -3,6 +3,8 @@
 import Reflux from 'reflux'
 import ExtensionManager from '../actions/ExtensionManager'
 
+import type { ExtensionInfoType } from 'electron-shell-lib'
+
 /**
  * [config description]
  * @type {[type]}
@@ -22,11 +24,19 @@ class ExtensionStore extends Reflux.Store {
     }
   }
 
-  onInstallCompleted (extension) {
+  onInstallCompleted (extension: ExtensionInfoType) {
     this.setState({ lastError: null, extensions: [ extension, ...this.extensions ] })
   }
 
   onInstallFailed (err) {
+    this.setState({ lastError: err })
+  }
+
+  onMountAllCompleted(extensions: Array<ExtensionInfoType>) {
+    this.setState({ lastError: null, extensions: extensions })
+  }
+
+  onMountAllFailed(err) {
     this.setState({ lastError: err })
   }
 }

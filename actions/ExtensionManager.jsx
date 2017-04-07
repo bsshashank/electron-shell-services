@@ -55,9 +55,9 @@ ExtensionManager.initialize.listen(function (fileStorage: IFileStorage, docDB: I
 ExtensionManager.mountAll.listen(function () {
   if ((!_docDB) || (!_fileStorage) || (!_extensionFolder))
     this.failed('ERR_NOT_INITIALISED')
-  _docDB.query('extensions/byStatus', { key: 'active '}).then(({ rows }) => {
-    console.log(rows)
-    this.completed(rows)
+  _docDB.query('extensions/byStatus', { keys: ['active', 'deactive'] }).then(({ rows }) => {
+    let plugins: Array<ExtensionInfoType> = rows.map((p) => p.value)
+    this.completed(plugins)
   }).catch(this.failed)
 })
 
