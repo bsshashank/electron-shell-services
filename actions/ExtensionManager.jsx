@@ -64,11 +64,27 @@ ExtensionManager.mountAll.listen(function () {
 ExtensionManager.activate.listen(function (extName: string) {
   if ((!_docDB) || (!_fileStorage) || (!_extensionFolder))
     this.failed('ERR_NOT_INITIALISED')
+  let extension
+  _docDB.lookup(extName).then((doc) => {
+    extension = doc
+    extension.status = 'active'
+    return _docDB.save(extension)
+  }).then (() => {
+    this.completed(extension)
+  }).catch(this.failed)
 })
 
 ExtensionManager.deactivate.listen(function (extName: string) {
   if ((!_docDB) || (!_fileStorage) || (!_extensionFolder))
     this.failed('ERR_NOT_INITIALISED')
+  let extension
+  _docDB.lookup(extName).then((doc) => {
+    extension = doc
+    extension.status = 'deactive'
+    return _docDB.save(extension)
+  }).then (() => {
+    this.completed(extension)
+  }).catch(this.failed)
 })
 
 ExtensionManager.install.listen(function (extName: string, extPackage: File) {
@@ -80,7 +96,7 @@ ExtensionManager.install.listen(function (extName: string, extPackage: File) {
     let extension: IExtension = utils.extensionLoader.tryLoadExtension(location, file)
     console.log(extension)
     extInfo = {
-      _id: extension.id,
+      _id: `ext.${extension.id}`,
       name: extension.name,
       description: extension.description,
       version: extension.version,

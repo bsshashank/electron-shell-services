@@ -41,6 +41,34 @@ class ExtensionStore extends Reflux.Store {
     console.log(err)
     this.setState({ lastError: err })
   }
+
+  onActivateCompleted(extension: ExtensionInfoType) {
+    const idx = this.state.extensions.findIndex((e) => e._id === extension._id)
+    let extensions = this.state.extensions
+    if (idx !== -1) {
+      extensions.splice(idx, 1, extension)
+    }
+    this.setState({ lastError: null, extensions: extensions })
+  }
+
+  onActivateFailed(err:Object) {
+    console.log(err)
+    this.setState({ lastError: err })
+  }
+
+  onDeactivateCompleted(extension: ExtensionInfoType) {
+    const idx = this.state.extensions.findIndex((e) => e._id === extension._id)
+    let extensions = this.state.extensions
+    if (idx !== -1) {
+      extensions.splice(idx, 1, extension)
+    }
+    this.setState({ lastError: null, extensions: extensions })
+  }
+
+  onDeactivateFailed(err:Object) {
+    console.log(err)
+    this.setState({ lastError: err })
+  }
 }
 
 export default ExtensionStore
