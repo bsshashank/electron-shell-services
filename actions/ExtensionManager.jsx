@@ -105,6 +105,8 @@ ExtensionManager.install.listen(function (extName: string, extPackage: File) {
       bannerImage: extension.bannerImage,
       hasSettings: (extension.settingView !== null),
       status: 'deactive',
+      location: location,
+      file: file,
       type: 'extension'
     }
     console.log(extInfo)
