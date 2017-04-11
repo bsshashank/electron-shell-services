@@ -38,7 +38,7 @@ ExtensionManager.initialize.listen(function (fileStorage: IFileStorage, docDB: I
   _docDB = docDB
   _settingManager = settingManager
   _translationManager = translationManager
-  _docDB.bulkInsert(viewSpecs).then(() => {
+  _docDB.bulkInsert(viewSpecs, { checkVersionTag: true }).then(() => {
     _extensionFolder = path.join(fileStorage.baseFolder, 'Plugins')
     if (!fs.existsSync(_extensionFolder)) {
       fs.mkdirSync(_extensionFolder)

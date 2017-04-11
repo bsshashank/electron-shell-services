@@ -24,7 +24,7 @@ const SettingManager = Reflux.createActions({
 
 SettingManager.initialize.listen(function (docDB: IDocumentDatabase) {
   _docDB = docDB
-  _docDB.bulkInsert(viewSpecs).then(this.completed).catch(this.failed)
+  _docDB.bulkInsert(viewSpecs, { checkVersionTag: true }).then(this.completed).catch(this.failed)
 })
 
 SettingManager.getByExtension.listen(function (extension: string) {

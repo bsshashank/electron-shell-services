@@ -28,7 +28,7 @@ const ActivityService = Reflux.createActions({
  */
 ActivityService.initialize.listen(function (docDB: IDocumentDatabase) {
   _docDB = docDB
-  _docDB.bulkInsert(viewSpecs).then(this.completed).catch(this.failed)
+  _docDB.bulkInsert(viewSpecs, { checkVersionTag: true }).then(this.completed).catch(this.failed)
 })
 
 /**

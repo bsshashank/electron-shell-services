@@ -5,7 +5,8 @@ import uuid from 'uuid'
 PouchDB.plugin(require('pouchdb-find'))
 PouchDB.plugin(require('pouchdb-quick-search'))
 
-import type { ApplicationConfig, DocumentDatabaseLookupOptions, DocumentDatabaseQueryOptions, IDocumentDatabase } from 'electron-shell-lib'
+import type { ApplicationConfig, DocumentDatabaseLookupOptions, DocumentDatabaseQueryOptions,
+              DocumentDatabaseSaveOptions, IDocumentDatabase } from 'electron-shell-lib'
 
 /**
  * Provides access to a document-style database
@@ -39,25 +40,29 @@ class DocumentDatabase implements IDocumentDatabase {
    * stores a document object into the database
    *
    * @param {Object} doc the document that should be persisted into the database
+   * @param {DocumentDatabaseSaveOptions} options the options object with additional parameters for the database save
    * @returns {Promise} a promise object signalling either success or failure of the operation
    *
    * @memberOf IDocumentDatabase
    */
-  save(doc: Object): Promise<*> {
+  save(doc: Object, options?:DocumentDatabaseSaveOptions): Promise<*> {
     if (!doc._id) {
       doc._id = uuid.v4()
     }
 
-    if (!doc.timestamp) {
+    if ((options) && (options.addTimestamp) && (!doc.timestamp)) {
       doc.timestamp = new Date()
     }
 
     var promise = Promise.resolve(this.db.get(doc._id).then((result) => {
-      if ((result.version === undefined) || (result.version !== doc.version)) {
-        doc._rev = result._rev
-        return this.db.put(doc)
+      doc._rev = result._rev
+      if ((options) && (options.checkVersionTag)) {
+        if (result.version !== doc.version)
+          return this.db.put(doc)
+        else
+          return doc
       }
-      return true
+      return this.db.put(doc)
     }).catch((err) => {
       if (err.status == 404) {
         return this.db.put(doc)
@@ -102,13 +107,14 @@ class DocumentDatabase implements IDocumentDatabase {
    * inserts multiple objects as bulk into the database
    *
    * @param {Array<Object>} docs the array of documents to insert into the database
+   * @param {DocumentDatabaseSaveOptions} options the options object with additional parameters for the database save
    * @returns {Promise} a promise object signalling either success or failure of the operation
    *
    * @memberOf IDocumentDatabase
    */
-  bulkInsert(docs:Array<Object>): Promise<*> {
+  bulkInsert(docs:Array<Object>, options?:DocumentDatabaseSaveOptions): Promise<*> {
     let p = new Promise((resolve, reject) => {
-      let items = docs.map((doc) => this.save(doc))
+      let items = docs.map((doc) => this.save(doc, options))
       Promise.all(items).then(resolve).catch(reject)
     })
     return p

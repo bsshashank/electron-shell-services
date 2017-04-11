@@ -70,7 +70,7 @@ const TranslationManager = Reflux.createActions({
 
 TranslationManager.initialize.listen(function (docDB: IDocumentDatabase) {
   _docDB = docDB
-  _docDB.bulkInsert(viewSpecs).then(() => {
+  _docDB.bulkInsert(viewSpecs, { checkVersionTag: true }).then(() => {
     return _loadAvailableLocales()
   }).then(({ availableLocales }) => {
     this.completed(availableLocales)
@@ -97,7 +97,7 @@ TranslationManager.import.listen(function (locale: string, messages: Array<Trans
   messages.forEach((m) => {
     m.locale = locale
   })
-  _docDB.bulkInsert(messages).then(() => {
+  _docDB.bulkInsert(messages, { checkVersionTag: true }).then(() => {
     this.completed(locale, messages)
   }).catch(this.failed)
 })
