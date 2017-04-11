@@ -5,8 +5,8 @@
     "all": {
       "map": "function mapFun (doc) { if (doc.type === 'setting') { emit (doc.id, doc) } }"
     },
-    "byExtension": {
-      "map": "function mapFun (doc) { if (doc.type === 'setting') { emit (doc.extensionid, doc) } }"
+    "byName": {
+      "map": "function mapFun (doc) { if (doc.type === 'setting') { emit (doc.namespace + '.' + doc.name, doc) } }"
     }
   }
 }]

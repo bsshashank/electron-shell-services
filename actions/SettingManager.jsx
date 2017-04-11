@@ -33,7 +33,6 @@ const _loadAllSettings = (): Promise<*> => {
  */
 const SettingManager = Reflux.createActions({
   'initialize': { asyncResult: true },
-  'getByExtension': { asyncResult: true },
   'update': { asyncResult: true },
   'import': { asyncResult: true },
   'export': { asyncResult: true }
@@ -48,14 +47,17 @@ SettingManager.initialize.listen(function (docDB: IDocumentDatabase) {
   }).catch(this.failed)
 })
 
-SettingManager.getByExtension.listen(function (extension: string) {
+SettingManager.update.listen(function (namespace:string, name:string, value:Object) {
   if (!_docDB)
     this.failed('ERR_NOT_INITIALISED')
-})
-
-SettingManager.update.listen(function (setting: SettingType) {
-  if (!_docDB)
-    this.failed('ERR_NOT_INITIALISED')
+  _docDB.query('settings/byName', { key: `${namespace}.${name}` }).then(({ rows }) => {
+    console.log(rows)
+    let setting = rows[0].value
+    setting.value = value
+    return _docDB.save(setting)
+  }).then((doc) => {
+    this.completed(namespace, name, value)
+  }).catch(this.failed)
 })
 
 SettingManager.import.listen(function (settings: Array<SettingType>) {

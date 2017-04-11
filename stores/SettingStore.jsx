@@ -23,7 +23,6 @@ class SettingStore extends Reflux.Store {
   }
 
   onInitializeCompleted(settings:Object) {
-    console.log(settings)
     this.setState({ lastError: null, settings: settings })
   }
 
@@ -33,11 +32,21 @@ class SettingStore extends Reflux.Store {
   }
 
   onImportCompleted(settings:Object) {
-    console.log(settings)
     this.setState({ lastError: null, settings: settings })
   }
 
   onImportFailed(err:Object) {
+    console.log(err)
+    this.setState({ lastError: err })
+  }
+
+  onUpdateCompleted(namespace:string, name:string, value:Object) {
+    let settings = this.state.settings
+    settings[namespace][name] = value
+    this.setState({ lastError: null, settings: settings })
+  }
+
+  onUpdateFailed(err:Object) {
     console.log(err)
     this.setState({ lastError: err })
   }
