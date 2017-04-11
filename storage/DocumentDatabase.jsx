@@ -5,8 +5,7 @@ import uuid from 'uuid'
 PouchDB.plugin(require('pouchdb-find'))
 PouchDB.plugin(require('pouchdb-quick-search'))
 
-import type { ApplicationConfig, DocumentDatabaseLookupOptions, DocumentDatabaseQueryOptions,
-              DocumentDatabaseSaveOptions, IDocumentDatabase } from 'electron-shell-lib'
+import type { ApplicationConfig, IDocumentDatabase } from 'electron-shell-lib'
 
 /**
  * Provides access to a document-style database
@@ -45,7 +44,7 @@ class DocumentDatabase implements IDocumentDatabase {
    *
    * @memberOf IDocumentDatabase
    */
-  save(doc: Object, options?:DocumentDatabaseSaveOptions): Promise<*> {
+  save(doc: Object, options?:{ checkVersionTag?: boolean, addTimestamp?: boolean }): Promise<*> {
     if (!doc._id) {
       doc._id = uuid.v4()
     }
@@ -83,7 +82,7 @@ class DocumentDatabase implements IDocumentDatabase {
    *
    * @memberOf IDocumentDatabase
    */
-  lookup(id:string, options?:DocumentDatabaseLookupOptions): Promise<*> {
+  lookup(id:string, options?:{ rev?: string, revs?: boolean, revs_info?: boolean, conflicts?: boolean, attachments?: boolean }): Promise<*> {
     if (options) {
       return this.db.get(id, options)
     }
@@ -99,7 +98,9 @@ class DocumentDatabase implements IDocumentDatabase {
    *
    * @memberOf IDocumentDatabase
    */
-  query(view:string, options:DocumentDatabaseQueryOptions): Promise<*> {
+  query(view:string, options:{ reduce?: boolean | string, include_docs?: boolean, conflicts?: boolean, attachments?: boolean,
+        startkey?: string, endkey?: string, limit?: number, skip?: number, descending?: boolean, key?: string, keys?: Array<string>,
+        group?: boolean, group_level?: number }): Promise<*> {
     return this.db.query(view, options)
   }
 
@@ -112,7 +113,7 @@ class DocumentDatabase implements IDocumentDatabase {
    *
    * @memberOf IDocumentDatabase
    */
-  bulkInsert(docs:Array<Object>, options?:DocumentDatabaseSaveOptions): Promise<*> {
+  bulkInsert(docs:Array<Object>, options?:{ checkVersionTag?: boolean, addTimestamp?: boolean }): Promise<*> {
     let p = new Promise((resolve, reject) => {
       let items = docs.map((doc) => this.save(doc, options))
       Promise.all(items).then(resolve).catch(reject)
