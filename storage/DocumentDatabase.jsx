@@ -98,7 +98,7 @@ class DocumentDatabase implements IDocumentDatabase {
    *
    * @memberOf IDocumentDatabase
    */
-  query(view:string, options:{ reduce?: boolean | string, include_docs?: boolean, conflicts?: boolean, attachments?: boolean,
+  query(view:string, options?:{ reduce?: boolean | string, include_docs?: boolean, conflicts?: boolean, attachments?: boolean,
         startkey?: string, endkey?: string, limit?: number, skip?: number, descending?: boolean, key?: string, keys?: Array<string>,
         group?: boolean, group_level?: number }): Promise<*> {
     return this.db.query(view, options)

@@ -96,7 +96,8 @@ ExtensionManager.install.listen(function (extName: string, extPackage: File) {
     let extension: IExtension = utils.extensionLoader.tryLoadExtension(location, file)
     console.log(extension)
     extInfo = {
-      _id: `ext.${extension.id}`,
+      _id: `ext:${extension.id}`,
+      id: extension.id,
       name: extension.name,
       description: extension.description,
       version: extension.version,

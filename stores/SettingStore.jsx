@@ -18,8 +18,28 @@ class SettingStore extends Reflux.Store {
     this.listenables = SettingManager
     this.state = {
       lastError: null,
-      settings: []
+      settings: {}
     }
+  }
+
+  onInitializeCompleted(settings:Object) {
+    console.log(settings)
+    this.setState({ lastError: null, settings: settings })
+  }
+
+  onInitializeFailed(err:Object) {
+    console.log(err)
+    this.setState({ lastError: err })
+  }
+
+  onImportCompleted(settings:Object) {
+    console.log(settings)
+    this.setState({ lastError: null, settings: settings })
+  }
+
+  onImportFailed(err:Object) {
+    console.log(err)
+    this.setState({ lastError: err })
   }
 }
 

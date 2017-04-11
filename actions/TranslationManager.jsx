@@ -99,6 +99,7 @@ TranslationManager.import.listen(function (locale: string, messages: Array<Trans
   if (!_docDB)
     this.failed('ERR_NOT_INITIALISED')
   messages.forEach((m) => {
+    m._id = `msg:${m.id}`
     m.locale = locale
   })
   _docDB.bulkInsert(messages, { checkVersionTag: true }).then(() => {

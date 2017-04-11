@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "views": {
     "byLocale": {
-      "map": "function mapFun(doc) {\n    if (doc.type === 'translation') {\n        emit(doc.locale, { data: doc, intl: { [doc._id]: doc.translation } })\n    }\n}",
+      "map": "function mapFun(doc) {\n    if (doc.type === 'translation') {\n        emit(doc.locale, { data: doc, intl: { [doc.id]: doc.translation } })\n    }\n}",
       "reduce": "function (keys, values, rereduce) {\n  if (rereduce) {\n    return values;\n  } else {\n    let dataItems = values.map(v => v.data)\n    let intls = {}\n    values.forEach(v => Object.assign(intls, v.intl))\n    return { data: dataItems, intl: intls };\n  }\n}"
     },
     "availableLocales": {
