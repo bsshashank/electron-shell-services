@@ -53,9 +53,12 @@ class TranslationsStore extends Reflux.Store {
     this.setState({ lastError: err })
   }
 
-  onImportCompleted(locale:string, messages:Array<Object>) {
+  onImportCompleted(locale:string, localeData:Object) {
     if (!this.state.availableLocales.find((l) => l === locale)) {
       this.setState({ availableLocales: [locale, ...this.state.availableLocales] })
+    }
+    if (localeData) {
+      this.setState({ localeData: localeData })
     }
   }
 

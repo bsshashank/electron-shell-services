@@ -11,6 +11,7 @@ import viewSpecs from './TranslationManager.json'
 import type { TranslationType, IDocumentDatabase } from 'electron-shell-lib'
 
 let _docDB: IDocumentDatabase
+let _activeLocale: string
 
 /**
  *
@@ -43,6 +44,8 @@ const _loadAvailableLocales = (): Promise<*> => {
  * @param {*} locale
  */
 const _setNewLocale = (locale: string) => {
+  const l = _activeLocale
+  _activeLocale = locale
   const idx = locale.indexOf('-')
   if (idx !== -1) {
     locale = locale.substr(0, idx)
@@ -53,6 +56,7 @@ const _setNewLocale = (locale: string) => {
   }
   catch (err) {
     console.log(`Could not load locale ${locale}`)
+    _activeLocale = l
     throw 'ERR_SWITCH_LOCALE'
   }
 }
@@ -98,7 +102,9 @@ TranslationManager.import.listen(function (locale: string, messages: Array<Trans
     m.locale = locale
   })
   _docDB.bulkInsert(messages, { checkVersionTag: true }).then(() => {
-    this.completed(locale, messages)
+    return (locale === _activeLocale ? _loadTranslations(_activeLocale) : Promise.resolve({ locale, localeData: null }))
+  }).then(({ locale, localeData }) => {
+    this.completed(locale, localeData)
   }).catch(this.failed)
 })
 
