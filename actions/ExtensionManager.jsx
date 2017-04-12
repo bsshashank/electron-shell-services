@@ -94,7 +94,6 @@ ExtensionManager.install.listen(function (extName: string, extPackage: File) {
   let extInfo: ExtensionInfoType
   _fileStorage.upload(extPackage, _extensionFolder).then(({ location, file }) => {
     let extension: IExtension = utils.extensionLoader.tryLoadExtension(location, file)
-    console.log(extension)
     extInfo = {
       _id: `ext:${extension.id}`,
       id: extension.id,
@@ -102,15 +101,14 @@ ExtensionManager.install.listen(function (extName: string, extPackage: File) {
       description: extension.description,
       version: extension.version,
       author: extension.author,
-      route: extension.initialRoute,
-      bannerImage: extension.bannerImage,
+      bannerImage: path.join(_fileStorage.baseFolder, 'Plugins', file, extension.bannerImage),
       hasSettings: (extension.settingView !== null),
       status: 'deactive',
-      startupPoint: file,
+      package: file,
       type: 'extension'
     }
-    console.log(extInfo)
-    return extension.register(_settingManager, _translationManager)
+    let extensionStorage:IFileStorage = _fileStorage.getExtensionFolder(extInfo.id)
+    return extension.register(extensionStorage, _settingManager, _translationManager)
   }).then(() => {
     return _docDB.save(extInfo)
   }).then(() => {

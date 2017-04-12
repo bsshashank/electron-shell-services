@@ -51,7 +51,6 @@ SettingManager.update.listen(function (namespace:string, name:string, value:Obje
   if (!_docDB)
     this.failed('ERR_NOT_INITIALISED')
   _docDB.query('settings/byName', { key: `${namespace}.${name}` }).then(({ rows }) => {
-    console.log(rows)
     let setting = rows[0].value
     setting.value = value
     return _docDB.save(setting)

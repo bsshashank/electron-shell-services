@@ -193,6 +193,13 @@ class FileStorage implements IFileStorage {
 
     return promise
   }
+
+  getExtensionFolder(extension: string): IFileStorage {
+    if (!this.exists(extension, 'folder')) {
+      this.create(extension, 'folder')
+    }
+    return new FileStorage(this.config, extension)
+  }
 }
 
 export default FileStorage
